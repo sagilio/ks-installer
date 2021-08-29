@@ -9,9 +9,8 @@ on:
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: ks-installer
-  IMAGE_REPO: kubespheredev
+  IMAGE_REPO: sagilio
   IMAGE_VERSION: latest
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_TEST }}
 
 jobs:
   Test-on-k8s-v-1-19-7:
@@ -59,13 +58,6 @@ jobs:
           echo "is_MY_SECRET_set: ${{ env.MY_SECRET != '' }}"
           echo "::set-output name=is_MY_SECRET_set::${{ env.MY_SECRET != '' }}"
 
-    - name: slack
-      uses: 8398a7/action-slack@v3
-      with:
-        status: ${{ job.status }}
-        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-      if: ${{ failure() }}
-
   push-image-to-dockerhub:
     runs-on: ubuntu-latest
     needs: [Test-on-k8s-v-1-19-7]
@@ -88,9 +80,3 @@ jobs:
           echo $IMAGE
           docker push $IMAGE
           echo "Push $IMAGE success!"
-      - name: slack
-        uses: 8398a7/action-slack@v3
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-        if: ${{ failure() }}

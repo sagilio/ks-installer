@@ -1,4 +1,4 @@
-name: NightlyBuild
+name: TestingBuild
 
 on:
   schedule:
@@ -10,19 +10,19 @@ on:
 env:
   # TODO: Change variable to your image's name.
   IMAGE_NAME: ks-installer
-  IMAGE_REPO: kubespheredev
+  IMAGE_REPO: sagilio
   IMAGE_VERSION: latest
 
 jobs:
   push:
     runs-on: ubuntu-latest
-    if: github.repository	== 'kubesphere/ks-installer'
+    if: github.repository	== 'sagilio/ks-installer'
     steps:
       - uses: actions/checkout@v2
 
       - name: Build image
         run: |
-          tag=nightly-$(date '+%Y%m%d')
+          tag=testing-$(date '+%Y%m%d%H%M')
           sed -i "2idev_tag\: $tag" roles/download/defaults/main.yml
           docker build . --file Dockerfile --tag $IMAGE_NAME
 
@@ -33,16 +33,9 @@ jobs:
         run: |
           IMAGE_ID=$IMAGE_REPO/$IMAGE_NAME
           
-          tag=nightly-$(date '+%Y%m%d')
+          tag=testing-$(date '+%Y%m%d%H%M')
 
           docker tag $IMAGE_NAME $IMAGE_ID:${tag}
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:${tag}
-
-      - name: slack
-        uses: 8398a7/action-slack@v3
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL_NIGHTLY }}
-        with:
-          status: ${{ job.status }}
-          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
-        if: ${{ failure() }}
+          docker push $IMAGE_ID:latest
