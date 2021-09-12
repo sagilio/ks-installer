@@ -107,12 +107,23 @@ data:
 {% if multicluster.proxyPublishAddress is defined and multicluster.proxyPublishAddress != "" %}
       proxyPublishAddress: {{ multicluster.proxyPublishAddress }}
 {% endif %}
+{% if multicluster.clusterControllerResyncPeriod is defined and multicluster.clusterControllerResyncPeriod != "" %}
+      clusterControllerResyncPeriod: {{ multicluster.clusterControllerResyncPeriod }}
+{% endif %}
+{% if multicluster.hostClusterName is defined and multicluster.hostClusterName != "" %}
+      hostClusterName: {{ multicluster.hostClusterName }}
+{% endif %}
 {% endif %}
     monitoring:
 {% if common.monitoring is defined and common.monitoring.endpoint is defined %}
       endpoint: {{ common.monitoring.endpoint }}
 {% else %}
       endpoint: http://prometheus-operated.kubesphere-monitoring-system.svc:9090
+{% endif %}
+{% if common.monitoring.GPUMonitoring is defined and common.monitoring.GPUMonitoring.enabled == true %}
+      enableGPUMonitoring: true
+{% else %}
+      enableGPUMonitoring: false
 {% endif %}
 {% if logging.enabled is defined and logging.enabled == true %}
     logging:
